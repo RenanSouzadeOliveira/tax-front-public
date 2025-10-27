@@ -19,6 +19,48 @@
     // This will be read by ApiConfiguration to build API endpoints.
     window.__API_BASE__ = window.__API_BASE__ || 'https://cpro50850.publiccloud.com.br';
   </script>
+  <!-- Inline error overlay: shows runtime errors so deployed custom domains reveal exceptions -->
+  <script>
+    (function(){
+      function createOverlay(){
+        try{
+          var el=document.createElement('div');
+          el.id='runtime-error-overlay';
+          el.style.position='fixed';
+          el.style.left='12px';
+          el.style.right='12px';
+          el.style.bottom='12px';
+          el.style.maxHeight='40%';
+          el.style.overflow='auto';
+          el.style.background='rgba(0,0,0,0.85)';
+          el.style.color='#fff';
+          el.style.fontFamily='monospace';
+          el.style.fontSize='13px';
+          el.style.padding='12px';
+          el.style.zIndex='2147483647';
+          el.style.borderRadius='6px';
+          el.style.boxShadow='0 6px 18px rgba(0,0,0,.6)';
+          el.innerText='Runtime errors will appear here. If this box shows, please copy its contents and share.';
+          document.documentElement.appendChild(el);
+          return el;
+        }catch(e){console.error(e)}
+      }
+      var overlay=null;
+      function ensure(){overlay=overlay||createOverlay();return overlay}
+      window.addEventListener('error',function(ev){
+        var o=ensure();
+        var msg=(ev && ev.message?ev.message:ev.toString())+'\n'+(ev && ev.filename?ev.filename:'')+':'+(ev && ev.lineno?ev.lineno:'');
+        o.innerText = msg + '\n\n' + (ev && ev.error && ev.error.stack?ev.error.stack:'');
+      },true);
+      window.addEventListener('unhandledrejection',function(ev){
+        var o=ensure();
+        var reason=ev && ev.reason?ev.reason:ev;
+        o.innerText = 'Unhandled Promise Rejection:\n' + (reason && reason.stack?reason.stack:JSON.stringify(reason));
+      },true);
+      var origConsoleError = console.error.bind(console);
+      console.error = function(){try{var o=ensure(); var args=Array.from(arguments).map(function(a){try{return typeof a==='object'?JSON.stringify(a):String(a)}catch(e){return String(a)}}).join(' '); o.innerText = 'Console.error: ' + args; }catch(e){}; origConsoleError.apply(console,arguments)};
+    })();
+  </script>
   <app-root></app-root>
 <link rel="modulepreload" href="chunk-VXWOFIXU.js"><link rel="modulepreload" href="chunk-52ATS5LU.js"><script src="main-VVDOFLWJ.js" type="module"></script></body>
 </html>
